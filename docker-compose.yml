@@ -1,0 +1,52 @@
+version: '3.9'  # Versión estable y compatible en 2026
+
+services:
+  backend:
+    build:
+      context: .               # Usa la carpeta actual (donde está el Dockerfile)
+      dockerfile: Dockerfile   # Nombre de tu archivo Dockerfile
+    container_name: mi-proyecto-backend
+    ports:
+      - "8080:8080"            # Mapea puerto 8080 del contenedor al 8080 de tu máquina
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev     # Perfil de desarrollo (opcional, puedes cambiar a prod)
+      - JAVA_OPTS="-Xms256m -Xmx512m"  # Límites de memoria JVM (ajusta según necesites)
+      # Variables de conexión a PostgreSQL (Spring Boot las detecta automáticamente)
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/mi_basedatos
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update   # crea/actualiza tablas automáticamente en dev
+      - SPRING_JPA_SHOW_SQL=true               # opcional: muestra SQL en logs
+    restart: unless-stopped    # Reinicia automáticamente si falla (útil en dev)
+    # Opcional: si más adelante agregas BD, descomenta depends_on
+    # depends_on:
+    #   - db
+
+    depends_on:
+      - db                     # El backend espera a que postgres esté listo
+    networks:
+      - app-network
+
+  db:
+    image: postgres:16-alpine   # Versión ligera y actualizada (2026)
+    container_name: mi-proyecto-postgres
+    ports:
+      - "5433:5432"            # Expones el puerto si quieres conectar desde pgAdmin/DBeaver
+    environment:
+      - POSTGRES_DB=mi_basedatos          # Nombre de la base de datos
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres   # Cambia esto por una contraseña fuerte
+    volumes:
+      - postgres-data:/var/lib/postgresql/data   # Persistencia de datos
+    restart: unless-stopped
+    networks:
+      - app-network
+
+# Volumen para que los datos de PostgreSQL persistan entre reinicios
+volumes:
+  postgres-data:
+
+# Red interna para que los contenedores se comuniquen por nombre (backend → db)
+networks:
+  app-network:
+    driver: bridge
