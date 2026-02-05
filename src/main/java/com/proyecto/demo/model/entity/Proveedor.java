@@ -1,8 +1,5 @@
 package com.proyecto.demo.model.entity;
 
-import java.util.Date;
-
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,7 +11,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
@@ -22,20 +18,16 @@ import lombok.NoArgsConstructor;
 @Builder
 
 @Entity
-@Table(name = "productos")
-public class Producto extends Entidad{
+@Table(name = "proveedores")
+public class Proveedor extends Entidad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String codigo;  
-    private String nombre;  
-    //private Double precio;
-    private String detalle; 
-    
-    @Column(name = "precio_compra")
-    private Long precioCompra;
-    @Column(name = "precio_venta")
-    private Long precioVenta;
-    private String imagen; 
+    private String nombre; //razon_social
+    private String nit;
+    private String telefono;
+    private String email; 
+    private String direccion;
+    private String contacto_principal;
 
 }

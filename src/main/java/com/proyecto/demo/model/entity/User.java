@@ -1,9 +1,7 @@
 package com.proyecto.demo.model.entity;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -17,15 +15,17 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "users")
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User { //implements UserDetail
+public class User extends Entidad{ //implements UserDetail
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

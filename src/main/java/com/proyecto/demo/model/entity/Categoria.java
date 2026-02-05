@@ -1,8 +1,5 @@
 package com.proyecto.demo.model.entity;
 
-import java.util.Date;
-
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,28 +11,18 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-
+@Entity
+@Table(name = "categorias")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
-@Entity
-@Table(name = "productos")
-public class Producto extends Entidad{
+public class Categoria extends Entidad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String codigo;  
-    private String nombre;  
-    //private Double precio;
-    private String detalle; 
+    private String nombre;
+    private String descripcion;
     
-    @Column(name = "precio_compra")
-    private Long precioCompra;
-    @Column(name = "precio_venta")
-    private Long precioVenta;
-    private String imagen; 
-
 }
