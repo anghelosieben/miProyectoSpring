@@ -1,7 +1,5 @@
 package com.proyecto.demo.model.entity;
 
-import java.util.Date;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -37,5 +35,6 @@ public class Producto extends Entidad{
     @Column(name = "precio_venta")
     private Long precioVenta;
     private String imagen; 
-
+    //id (PK), codigo, nombre, descripcion, categoria_id (FK), marca_id (FK), unidad_id (FK), precio_compra, precio_venta, stock_minimo, stock_maximo, imagen_url, activo
+    private Long stock;
 }

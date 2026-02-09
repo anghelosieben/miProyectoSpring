@@ -21,7 +21,7 @@ public class Entidad {
     public Entidad() {
         this.fechaRegistro = new Date();           // fecha actual al crear
         this.fechaActualizacion = new Date();      // misma fecha al crear
-        this.estado = "ACTIVO";                    // valor por defecto más común
+        this.estado = "AC";                    // valor por defecto más común
         this.usuarioRegistro = 100L;          // valor por defecto temporal
         this.usuarioActualizacion = 100L; 
         // se llenarán cuando se sepa quién está creando/actualizando

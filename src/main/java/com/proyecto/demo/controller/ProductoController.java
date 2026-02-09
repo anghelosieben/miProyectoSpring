@@ -55,4 +55,11 @@ public class ProductoController {
     public void eliminar(@PathVariable Long id) {
         productoService.deleteById(id);
     }
+    
+    @GetMapping("/nombre/{nombre}")
+    public ResponseEntity<List<Producto>> obtenerPorNombre(@PathVariable String nombre) {
+        return productoService.findByNombreOrCodigo(nombre)
+                .isEmpty() ? ResponseEntity.notFound().build()
+                : ResponseEntity.ok(productoService.findByNombreOrCodigo(nombre));                
+    }
 }

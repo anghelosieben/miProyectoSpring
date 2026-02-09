@@ -1,5 +1,6 @@
 package com.proyecto.demo.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -7,16 +8,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional; // Usar la anotación de Spring
 
 import com.proyecto.demo.model.entity.Producto;
-import com.proyecto.demo.repository.ProductoRepositoryImpl;
+import com.proyecto.demo.repository.ProductoRepository;
 
 @Service
 @Transactional(readOnly = true)  // Todas las lecturas son readOnly por default
 public class ProductoServiceImpl implements ProductoService {
 
-   private final ProductoRepositoryImpl productoRepository;
+   private final ProductoRepository productoRepository;
 
     // Inyección por constructor (mejor práctica)
-    public ProductoServiceImpl(ProductoRepositoryImpl productoRepository) {
+    public ProductoServiceImpl(ProductoRepository productoRepository) {
         this.productoRepository = productoRepository;
     }
 
@@ -34,13 +35,19 @@ public class ProductoServiceImpl implements ProductoService {
     @Transactional  // Esta sí escribe en BD, por eso @Transactional sin readOnly
     public Producto save(Producto producto) {
         // Aquí puedes agregar validaciones de negocio
-        if (producto.getPrecio() == null || producto.getPrecio() < 0) {
-            throw new IllegalArgumentException("El precio debe ser positivo");
+        if (producto.getPrecioCompra() == null || producto.getPrecioCompra() < 0) {
+            throw new IllegalArgumentException("El precio de compra debe ser positivo");
+        }
+        if (producto.getPrecioVenta() == null || producto.getPrecioVenta() < 0) {
+            throw new IllegalArgumentException("El precio de venta debe ser positivo");
         }
         if (producto.getNombre() == null || producto.getNombre().trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre del producto es obligatorio");
         }
-
+        producto.setUsuarioRegistro(1000L);
+        /*producto.setEstado("AC");
+        producto.setFechaRegistro(new Date());
+        producto.setFechaActualizacion(new Date());*/
         return productoRepository.save(producto);
     }
 
@@ -51,6 +58,13 @@ public class ProductoServiceImpl implements ProductoService {
             throw new RuntimeException("Producto con ID " + id + " no encontrado");
         }
         productoRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Producto> findByNombreOrCodigo(String nombre) {
+        System.out.println("nombre en service: "+nombre);
+        var producto=productoRepository.buscarPorNombreOCodigo(nombre);
+        return producto;
     }
 
 }
