@@ -58,9 +58,9 @@ public class VentaServiceImpl implements VentaService {
 
         // 2. Procesar cada detalle (todo en memoria, sin guardar aún)
         for (DetalleVenta detalle : venta.getDetalleVentas()) {
-            Producto producto = productoRepository.findById(detalle.getProducto().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado: " + detalle.getProducto().getId()));
-
+            /*Producto producto = productoRepository.findById(detalle.getProducto().getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado: " + detalle.getProducto().getId()));*/
+            Producto producto = detalle.getProducto();
             Integer cantidad = detalle.getCantidad();
             if (cantidad == null || cantidad <= 0) {
                 throw new IllegalArgumentException("Cantidad inválida en detalle");

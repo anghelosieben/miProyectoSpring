@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional; // Usar la anotación de Spring
-
 import com.proyecto.demo.model.entity.Producto;
 import com.proyecto.demo.repository.ProductoRepository;
 
