@@ -1,0 +1,30 @@
+<!-- Created with Jaspersoft Studio version 7.0.3.final using JasperReports Library version 7.0.3-41034ca841d452f3305ba55b9042260aaa1ab5dd  -->
+<jasperReport name="ReporteFinal" language="java" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="504df610-cb96-49ed-b7b9-494d56babf0a">
+	<parameter name="ventaId" class="java.lang.Long"/>
+	<parameter name="cliente" class="java.lang.String"/>
+	<parameter name="monto" class="java.math.BigDecimal"/>
+	<field name="Field_1" class="java.lang.String"/>
+	<title height="250">
+		<element kind="textField" uuid="611f25b2-9e87-4c2a-81be-63917d1fd662" x="0" y="0" width="572" height="60" fontSize="18.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<expression><![CDATA["REPORTE DE VENTA"]]></expression>
+		</element>
+		<element kind="staticText" uuid="ceb3b4c3-9ff6-44a2-9caf-b30c9c5a6bda" x="0" y="80" width="100" height="30" bold="true">
+			<text><![CDATA[ID Venta:]]></text>
+		</element>
+		<element kind="textField" uuid="c075ee41-3f60-440f-b701-55c684052582" x="100" y="80" width="472" height="30">
+			<expression><![CDATA[$P{ventaId}]]></expression>
+		</element>
+		<element kind="staticText" uuid="b273819f-aff7-4d41-bc42-61ef69a38746" x="0" y="120" width="100" height="30" bold="true">
+			<text><![CDATA[Cliente:]]></text>
+		</element>
+		<element kind="textField" uuid="c41533c8-5384-476e-8d2f-9b6bdf551304" x="100" y="120" width="472" height="30">
+			<expression><![CDATA[$P{cliente}]]></expression>
+		</element>
+		<element kind="staticText" uuid="38482611-e53b-4fd8-9b84-f372bd239ec6" x="0" y="160" width="100" height="30" bold="true">
+			<text><![CDATA[Monto Total:]]></text>
+		</element>
+		<element kind="textField" uuid="6e41e8ea-894b-465f-9666-f80a4799c4e4" x="100" y="160" width="472" height="30" pattern="#,##0.00">
+			<expression><![CDATA[$P{monto}]]></expression>
+		</element>
+	</title>
+</jasperReport>

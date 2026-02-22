@@ -81,6 +81,35 @@
 			<version>1.18.32</version>
 			<scope>provided</scope>
 		</dependency>
+
+
+		<!-- JasperReports principal (core + compilador de reportes) -->
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports</artifactId>
+			<version>7.0.0</version>  <!-- o la última 7.x disponible en Maven Central -->
+		</dependency>
+
+		<!-- Fuentes incluidas (Helvetica, DejaVu, etc. - evita problemas de fuentes en PDF) -->
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports-fonts</artifactId>
+			<version>7.0.0</version>
+		</dependency>
+
+		<!-- Exportador PDF moderno (mejor calidad, soporta PDF/A, firmas, etc.) -->
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports-pdf</artifactId>
+			<version>7.0.0</version>
+		</dependency>
+
+		<!-- Opcional: si usas gráficos, barras, pie charts avanzados -->
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports-chart-customizers</artifactId>
+			<version>7.0.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>

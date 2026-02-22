@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
+              http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="ReporteVenta" pageWidth="595" pageHeight="842" columnWidth="555"
+              leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+    <parameter name="ventaId" class="java.lang.Long" isForPrompting="false"/>
+    <parameter name="cliente" class="java.lang.String" isForPrompting="false"/>
+    <parameter name="fecha" class="java.util.Date" isForPrompting="false"/>
+    <parameter name="monto" class="java.math.BigDecimal" isForPrompting="false"/>
+    <parameter name="empresa" class="java.lang.String" isForPrompting="false"/>
+    <title>
+        <band height="79">
+            <staticText>
+                <reportElement x="0" y="0" width="555" height="20"/>
+                <text>REPORTE DE VENTA</text>
+            </staticText>
+            <textField>
+                <reportElement x="0" y="20" width="555" height="20"/>
+                <textFieldExpression class="java.lang.String">$P{empresa}</textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="0" y="40" width="555" height="20"/>
+                <textFieldExpression class="java.lang.String">"ID Venta: " + $P{ventaId}</textFieldExpression>
+            </textField>
+        </band>
+    </title>
+    <pageHeader>
+        <band height="60">
+            <staticText>
+                <reportElement x="0" y="0" width="100" height="20"/>
+                <text>Cliente:</text>
+            </staticText>
+            <textField>
+                <reportElement x="100" y="0" width="455" height="20"/>
+                <textFieldExpression class="java.lang.String">$P{cliente}</textFieldExpression>
+            </textField>
+        </band>
+    </pageHeader>
+    <detail>
+        <band height="40">
+            <staticText>
+                <reportElement x="0" y="0" width="200" height="20"/>
+                <text>Monto Total:</text>
+            </staticText>
+            <textField>
+                <reportElement x="200" y="0" width="355" height="20"/>
+                <textFieldExpression class="java.math.BigDecimal">$P{monto}</textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+    <summary>
+        <band height="50">
+            <staticText>
+                <reportElement x="0" y="10" width="555" height="20"/>
+                <text>Reporte generado automáticamente por el sistema</text>
+            </staticText>
+        </band>
+    </summary>
+</jasperReport>
