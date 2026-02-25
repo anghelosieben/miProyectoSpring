@@ -2,6 +2,11 @@ package com.proyecto.demo.controller;
 
 import java.util.List;
 
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+//import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -69,6 +74,12 @@ public class ProductoController {
         // Spring busca automáticamente el parámetro ?nombre=... en la URL
         return ResponseEntity.ok(productoService.findByNombreOrCodigo(nombre));
     }
-
+    @GetMapping("/paginar")
+    public ResponseEntity<Page<Producto>> listarProductos( @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size) 
+    {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(productoService.obtenerTodos(pageable));
+    }
     
 }

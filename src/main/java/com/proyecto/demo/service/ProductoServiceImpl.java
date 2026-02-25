@@ -1,9 +1,10 @@
 package com.proyecto.demo.service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional; // Usar la anotación de Spring
 import com.proyecto.demo.model.entity.Producto;
@@ -65,5 +66,9 @@ public class ProductoServiceImpl implements ProductoService {
         var producto=productoRepository.buscarPorNombreOCodigo(nombre);
         return producto;
     }
-
+    
+    @Override
+    public Page<Producto> obtenerTodos(Pageable pageable) {
+        return productoRepository.findAll(pageable);
+    }
 }
