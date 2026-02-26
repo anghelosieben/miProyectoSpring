@@ -10,6 +10,7 @@ import com.proyecto.demo.model.entity.Proveedor;
 
 /**
  * @author Anghelo Muñoz Lopez
+ * @since 2026-02-25
  */
 public interface ProveedorService {
     List<Proveedor> findAll();

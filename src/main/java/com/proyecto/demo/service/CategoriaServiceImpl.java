@@ -9,6 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.proyecto.demo.model.entity.Categoria;
 import com.proyecto.demo.repository.CategoriaRepository;
 
+/**
+ * @author Anghelo Muñoz Lopez
+ * @since 2026-02-25
+ */
 @Service
 @Transactional
 public class CategoriaServiceImpl implements CategoriaService {

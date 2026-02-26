@@ -23,6 +23,7 @@ import com.proyecto.demo.service.ProveedorService;
 
 /**
  * @author Anghelo Muñoz Lopez
+ * @since 2026-02-25
  */
 @RestController
 @RequestMapping("/api/proveedores")

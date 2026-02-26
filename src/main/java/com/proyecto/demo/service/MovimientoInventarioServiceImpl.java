@@ -11,6 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.proyecto.demo.model.entity.MovimientoInventario;
 import com.proyecto.demo.repository.MovimientoInventarioRepository;
 
+/**
+ * @author Anghelo Muñoz Lopez
+ * @since 2026-02-25
+ */
 @Service
 @Transactional
 public class MovimientoInventarioServiceImpl implements MovimientoInventarioService {

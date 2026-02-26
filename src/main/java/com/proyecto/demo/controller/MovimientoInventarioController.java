@@ -21,6 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.proyecto.demo.model.entity.MovimientoInventario;
 import com.proyecto.demo.service.MovimientoInventarioService;
 
+/**
+ * @author Anghelo Muñoz Lopez
+ * @since 2026-02-25
+ */
 @RestController
 @RequestMapping("/api/movimientos-inventario")
 public class MovimientoInventarioController {

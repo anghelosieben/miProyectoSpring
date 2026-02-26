@@ -13,6 +13,7 @@ import com.proyecto.demo.repository.ProveedorRepository;
 
 /**
  * @author Anghelo Muñoz Lopez
+ * @since 2026-02-25
  */
 @Service
 @Transactional

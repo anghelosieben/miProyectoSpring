@@ -9,6 +9,7 @@ import com.proyecto.demo.model.entity.Proveedor;
 
 /**
  * @author Anghelo Muñoz Lopez
+ * @since 2026-02-25
  */
 @Repository
 public interface ProveedorRepository extends JpaRepository<Proveedor, Long> {

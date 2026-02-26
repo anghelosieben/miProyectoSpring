@@ -17,6 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.proyecto.demo.model.entity.Categoria;
 import com.proyecto.demo.service.CategoriaService;
 
+/**
+ * @author Anghelo Muñoz Lopez
+ * @since 2026-02-25
+ */
 @RestController
 @RequestMapping("/api/categorias")
 public class CategoriaController {
