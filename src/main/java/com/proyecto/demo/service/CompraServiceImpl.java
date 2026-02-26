@@ -1,7 +1,11 @@
 package com.proyecto.demo.service;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +17,9 @@ import com.proyecto.demo.repository.CompraRepository;
 import com.proyecto.demo.repository.MovimientoInventarioRepository;
 import com.proyecto.demo.repository.ProductoRepository;
 
+/**
+ * @author Anghelo Muñoz Lopez
+ */
 @Service
 @Transactional(readOnly = false)
 public class CompraServiceImpl implements CompraService {
@@ -89,6 +96,31 @@ public class CompraServiceImpl implements CompraService {
             movimientoInventarioRepository.save(mov);
         }
         return compraGuardada;
+    }
+
+    @Override
+    public List<Compra> findAll() {
+        return compraRepository.findAll();
+    }
+
+    @Override
+    public Optional<Compra> findById(Long id) {
+        return compraRepository.findById(id);
+    }
+
+    @Override
+    public Compra save(Compra compra) {
+        return compraRepository.save(compra);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        compraRepository.deleteById(id);
+    }
+
+    @Override
+    public Page<Compra> findAllPageable(Pageable pageable) {
+        return compraRepository.findAll(pageable);
     }
 
 }
