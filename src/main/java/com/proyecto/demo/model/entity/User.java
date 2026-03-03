@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,6 +34,10 @@ public class User extends Entidad{ //implements UserDetail
     private String username;
     private String email;
     private String password; // hashed!
+
+    @ManyToOne
+    @JoinColumn(name = "almacen_id")
+    private Almacen almacenAsignado;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

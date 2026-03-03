@@ -5,6 +5,7 @@ import java.util.List;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -44,4 +45,8 @@ public class Venta extends Entidad {
 
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleVenta> detalleVentas;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "almacen_id")
+    private Almacen almacen; // <--- Identifica a dónde entra la carga
 }

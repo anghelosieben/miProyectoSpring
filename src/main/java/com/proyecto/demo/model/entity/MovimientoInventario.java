@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -51,4 +52,8 @@ public class MovimientoInventario extends Entidad {
 
     // Opcional: stock después del movimiento (para auditoría rápida)
     private BigDecimal stockPosterior;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "almacen_id")
+    private Almacen almacen; // <--- Identifica a dónde entra la carga
 }

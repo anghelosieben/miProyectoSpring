@@ -16,7 +16,8 @@ public class ClienteServiceImpl implements ClienteService {
 
     @Override
     public List<Cliente> obtenerPorCiONit(String ciOrNit) {
-        List<Cliente> cliente = clienteRepository.findByCi(ciOrNit);
+        List<Cliente> cliente = clienteRepository.findByNitContaining(ciOrNit);
+        System.out.println("Cliente encontrado por CI: " + cliente);
         if (!cliente.isEmpty()) {
             return cliente;
         }
@@ -31,5 +32,10 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     public Cliente agregarCliente(Cliente cliente) {
         return clienteRepository.save(cliente);
+    }
+
+    @Override
+    public List<Cliente> buscarPorCiONit(String termino) {
+        return clienteRepository.findByCiStartingWith(termino);
     }
 }

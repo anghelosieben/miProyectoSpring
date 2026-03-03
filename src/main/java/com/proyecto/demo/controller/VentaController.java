@@ -1,6 +1,7 @@
 package com.proyecto.demo.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ContentDisposition;
@@ -31,6 +32,18 @@ public class VentaController {
         this.reporteService = reporteService;
     }
     
+    @GetMapping
+    public List<Venta> listarTodos() {
+        return ventaService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Venta> obtenerPorID(@PathVariable Long id) {
+        return ventaService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Venta> crearVenta(@RequestBody Venta venta) {

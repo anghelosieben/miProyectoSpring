@@ -12,4 +12,6 @@ import java.util.Optional;
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
 	List<Cliente> findByCi(String ci);
 	List<Cliente> findByNit(String nit);
+	List<Cliente> findByCiStartingWith(String ci);
+	List<Cliente> findByNitContaining(String nit);
 }

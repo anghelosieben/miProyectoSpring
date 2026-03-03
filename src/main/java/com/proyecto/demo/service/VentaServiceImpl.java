@@ -3,6 +3,7 @@ package com.proyecto.demo.service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,9 +38,9 @@ public class VentaServiceImpl implements VentaService {
     }
 
     @Override
-    public Venta findById(Long id) {
+    public Optional<Venta> findById(Long id) {
         // TODO Auto-generated method stub
-        return null;
+        return ventasRepository.findById(id);
     }
 
     @Override

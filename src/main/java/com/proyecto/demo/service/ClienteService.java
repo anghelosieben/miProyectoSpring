@@ -8,4 +8,5 @@ public interface ClienteService {
     List<Cliente> obtenerPorCiONit(String ciOrNit);
     List<Cliente> obtenerTodos();
     Cliente agregarCliente(Cliente cliente);
+    List<Cliente> buscarPorCiONit(String termino);
 }

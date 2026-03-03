@@ -24,6 +24,7 @@ public class ClienteController {
     @GetMapping("/buscar")
     public ResponseEntity<List<Cliente>> buscarPorCiONit(@RequestParam String termino) {
         List<Cliente> clientes = clienteService.obtenerPorCiONit(termino);
+        System.out.println("Clientes encontrados: " + clientes);
         if (clientes.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
