@@ -49,8 +49,4 @@ public class Venta extends Entidad {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "almacen_id")
     private Almacen almacen; // <--- Identifica a dónde entra la carga
-
-    /*@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_id")
-    private User usuario; // Usuario que realizó la venta*/
 }
