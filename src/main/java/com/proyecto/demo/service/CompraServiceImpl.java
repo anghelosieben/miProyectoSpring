@@ -9,13 +9,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.proyecto.demo.model.entity.Almacen;
 import com.proyecto.demo.model.entity.Compra;
 import com.proyecto.demo.model.entity.DetalleCompra;
 import com.proyecto.demo.model.entity.MovimientoInventario;
 import com.proyecto.demo.model.entity.Producto;
+import com.proyecto.demo.model.entity.StockAlmacen;
 import com.proyecto.demo.repository.CompraRepository;
 import com.proyecto.demo.repository.MovimientoInventarioRepository;
 import com.proyecto.demo.repository.ProductoRepository;
+import com.proyecto.demo.repository.StockAlmacenRepository;
+import com.proyecto.demo.security.utils.SecurityUtils;
 
 /**
  * @author Anghelo Muñoz Lopez
@@ -26,21 +30,27 @@ public class CompraServiceImpl implements CompraService {
     private final CompraRepository compraRepository;
     private final MovimientoInventarioRepository movimientoInventarioRepository;
     private final ProductoRepository productoRepository;
+    private final StockAlmacenRepository stockAlmacenRepository;
+    private final SecurityUtils securityUtils;
 
-    public CompraServiceImpl(CompraRepository compraRepository, MovimientoInventarioRepository movimientoInventarioRepository, ProductoRepository productoRepository) {
+    public CompraServiceImpl(CompraRepository compraRepository, 
+                            MovimientoInventarioRepository movimientoInventarioRepository, 
+                            ProductoRepository productoRepository,
+                            StockAlmacenRepository stockAlmacenRepository,
+                            SecurityUtils securityUtils) {
         this.compraRepository = compraRepository;
         this.movimientoInventarioRepository = movimientoInventarioRepository;
         this.productoRepository = productoRepository;
+        this.stockAlmacenRepository = stockAlmacenRepository;
+        this.securityUtils = securityUtils;
     }
 
     @Override
     @Transactional
     public Compra realizarCompra(Compra compra) {
-        // 1. Validaciones básicas (importante para evitar datos inválidos)
-        /*if (compra.getProveedor() == null) {
-            throw new IllegalArgumentException("La compra debe tener un proveedor");
-        }*/
-       System.out.println("Compra recibida: " + compra);
+        // Obtener el almacén del usuario autenticado
+        Almacen almacen = securityUtils.getCurrentAlmacen();
+        
         if (compra.getDetalleCompras() == null || compra.getDetalleCompras().isEmpty()) {
             throw new IllegalArgumentException("La compra debe tener al menos un detalle");
         }
@@ -48,25 +58,20 @@ public class CompraServiceImpl implements CompraService {
 
         // 2. Procesar cada detalle (validar, calcular, registrar movimiento, actualizar stock)
         for (DetalleCompra detalle : compra.getDetalleCompras()) {
-            // Obtener producto (usamos el que ya viene cargado en el detalle, si no → buscamos)
             Producto producto = detalle.getProducto();
             if (producto == null || producto.getId() == null) {
                 throw new IllegalArgumentException("Todo detalle debe tener un producto válido");
             }
 
-            // Refrescamos el producto desde BD para tener el stock actual (evita concurrencia)
-           /*  producto = productoRepository.findById(producto.getId())
-                    .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado: " + producto.getId()));
-            */
             Integer cantidad = detalle.getCantidad();
             if (cantidad == null || cantidad <= 0) {
                 throw new IllegalArgumentException("La cantidad debe ser mayor a 0");
             }
 
             // Calcular subtotal del detalle
-            double precio = detalle.getPrecio_unitario();  // debe venir del frontend o del producto
+            double precio = detalle.getPrecio_unitario();
             if (precio <= 0) {
-                precio = producto.getPrecioCompra();  // fallback al precio de compra del producto
+                precio = producto.getPrecioCompra();
                 detalle.setPrecio_unitario(precio);
             }
 
@@ -74,25 +79,49 @@ public class CompraServiceImpl implements CompraService {
             detalle.setSubtotal(subDetalle);
             subtotal += subDetalle;
 
-            // Sincronizar relación bidireccional (si la tienes en la entidad)
             detalle.setCompra(compra);
         }
         
         var compraGuardada = compraRepository.save(compra);
 
-        // TODO Auto-generated method stub
-        for (DetalleCompra detalle : compra.getDetalleCompras()) {
-            Producto producto = productoRepository.findById(detalle.getProducto().getId()).orElse(null);  // ya está cargado
+        // Actualizar stock en StockAlmacen
+        for (DetalleCompra detalle : compraGuardada.getDetalleCompras()) {
+            Producto producto = productoRepository.findById(detalle.getProducto().getId()).orElse(null);
+            
+            // Buscar o crear stock en el almacén
+            StockAlmacen stockAlmacen = stockAlmacenRepository
+                    .findByProductoAndAlmacen(producto, almacen)
+                    .orElse(null);
+            
+            // Guardar stock anterior antes de modificar
+            int stockAnterior = (stockAlmacen != null) ? stockAlmacen.getCantidadActual() : 0;
+            
+            if (stockAlmacen == null) {
+                // Crear nuevo registro de stock
+                stockAlmacen = StockAlmacen.builder()
+                        .producto(producto)
+                        .almacen(almacen)
+                        .cantidadActual(0)
+                        .build();
+            }
+            
+            // Aumentar stock en el almacén
+            int stockPosterior = stockAnterior + detalle.getCantidad();
+            stockAlmacen.setCantidadActual(stockPosterior);
+            stockAlmacenRepository.save(stockAlmacen);
+            
+            // Registrar movimiento de inventario
             MovimientoInventario mov = MovimientoInventario.builder()
                     .producto(producto)
+                    .almacen(almacen)
                     .cantidad(BigDecimal.valueOf(detalle.getCantidad()))
+                    .stockAnterior(BigDecimal.valueOf(stockAnterior))
+                    .stockPosterior(BigDecimal.valueOf(stockPosterior))
                     .tipoMovimiento("COMPRA")
                     .documentoReferencia("Compra ID: " + compraGuardada.getId())
                     .observacion("Movimiento generado por compra")
                     .build();
 
-            producto.setStock(producto.getStock() + detalle.getCantidad());        
-            productoRepository.save(producto);    
             movimientoInventarioRepository.save(mov);
         }
         return compraGuardada;
