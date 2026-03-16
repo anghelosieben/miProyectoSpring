@@ -43,16 +43,18 @@ public class MovimientoInventario extends Entidad {
     @Column(name = "fecha_movimiento")
     private LocalDateTime fechaMovimiento = LocalDateTime.now();
 
-    @ManyToOne
-    @JoinColumn(name = "usuario_id")
-    private User usuario;
+    //@ManyToOne
+    //@JoinColumn(name = "usuario_id")
+    //private User usuario;
 
     private String documentoReferencia; // número de factura, compra, etc.
     private String observacion;
 
+    private BigDecimal stockAnterior; // registra cuál era el stock ANTES del movimiento, para auditoría rápida.
+    
     // Opcional: stock después del movimiento (para auditoría rápida)
-    private BigDecimal stockPosterior;
-
+    private BigDecimal stockPosterior;// registra cuál era el stock DESPUÉS del movimiento, para auditoría completa.
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "almacen_id")
     private Almacen almacen; // <--- Identifica a dónde entra la carga
