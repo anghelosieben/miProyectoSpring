@@ -7,14 +7,23 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+/**
+ * @author Anghelo Muñoz Lopez
+ * @since 2026-02-25
+ */
 @Entity
 @Table(name = "stock_almacen")
 @Data
-public class StockAlmacen {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class StockAlmacen extends Entidad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
