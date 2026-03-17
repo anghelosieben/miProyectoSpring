@@ -19,6 +19,36 @@ Este agente personalizado está diseñado para ayudar a los desarrolladores a tr
 - Asistencia con despliegue y containerización
 ## Reglas de API REST
 
+### Formato de respuestas JSON
+Todas las respuestas deben usar el formato estándar de `ApiResponse`:
+
+```json
+{
+  "success": true,
+  "message": "Mensaje descriptivo",
+  "data": { ... },
+  "timestamp": "2026-03-16T20:00:00",
+  "path": "/api/recurso"
+}
+```
+
+- `success`: boolean - indica si la operación fue exitosa
+- `message`: string - mensaje descriptivo para el frontend
+- `data`: object/array/null - los datos de la respuesta
+- `timestamp`: LocalDateTime - fecha y hora de la respuesta
+- `path`: string - ruta de la petición
+
+### Errores
+```json
+{
+  "success": false,
+  "message": "Mensaje de error",
+  "data": null,
+  "timestamp": "2026-03-16T20:00:00",
+  "path": "/api/recurso"
+}
+```
+
 ### Códigos de respuesta HTTP
 - `GET` → 200 OK (con body)
 - `POST` → 201 Created (con body) o 200 OK
