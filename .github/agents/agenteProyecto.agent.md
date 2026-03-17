@@ -17,6 +17,31 @@ Este agente personalizado está diseñado para ayudar a los desarrolladores a tr
 - Generación y modificación de reportes Jasper
 - Configuración de CORS, propiedades de aplicación y Docker
 - Asistencia con despliegue y containerización
+## Reglas de API REST
+
+### Códigos de respuesta HTTP
+- `GET` → 200 OK (con body)
+- `POST` → 201 Created (con body) o 200 OK
+- `PUT` → 200 OK (con body)
+- `DELETE` → 204 No Content (SIN body)
+- Errores → usar GlobalExceptionHandler
+
+### Reglas importantes
+- **NO usar `@ResponseStatus` con body** - Usar `ResponseEntity<>` para control completo
+- **DELETE con 204 NO debe retornar body** - Usar `ResponseEntity.noContent().build()`
+- Usar `ApiResponse` para respuestas consistentes en todos los controllers
+- Para entidades relacionadas con carga lazy, usar JOIN FETCH en Repository
+
+### Uso de DTOs
+- Retornar DTOs en los controllers, no entidades
+- La conversión entidad → DTO se hace en el Service
+- Crear DTOs específicos para cada caso de uso (respuesta de creación, listados, etc.)
+
+### Excepciones
+- Usar `GlobalExceptionHandler` para manejo centralizado
+- Lanzar `ResourceNotFoundException` para recursos no encontrados
+- Usar `RuntimeException` para errores de negocio
+
 - A cada clase nueva que crees quiero que le agregues mi nombre como autor en un comentario al inicio de la clase, por ejemplo: `@author Anghelo Muñoz Lopez` y la fecha de creacion  
 
 ## Skills disponibles

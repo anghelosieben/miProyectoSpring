@@ -2,11 +2,9 @@ package com.proyecto.demo.controller;
 
 import java.util.List;
 
-
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Page;
-//import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,8 +18,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.proyecto.demo.exceptions.ApiResponse;
 import com.proyecto.demo.model.entity.Producto;
 import com.proyecto.demo.service.ProductoService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/productos")
@@ -33,53 +34,59 @@ public class ProductoController {
     }
 
     @GetMapping
-    public List<Producto> listarTodos() {
-        return productoService.findAll();
+    public ResponseEntity<ApiResponse<List<Producto>>> listarTodos() {
+        List<Producto> productos = productoService.findAll();
+        return ResponseEntity.ok(ApiResponse.success(productos, "Lista de productos", "/api/productos"));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Producto> obtenerPorId(@PathVariable Long id) {
-        return productoService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<ApiResponse<Producto>> getById(@PathVariable Long id, HttpServletRequest request) {
+        Producto product = productoService.findById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado con ID: " + id));
+        return ResponseEntity.ok(ApiResponse.success(product, "Producto encontrado", request.getRequestURI()));
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Producto crear(@RequestBody Producto producto) {
-        return productoService.save(producto);
+    public ResponseEntity<ApiResponse<Producto>> crear(@RequestBody Producto producto, HttpServletRequest request) {
+        Producto saved = productoService.save(producto);
+        return ResponseEntity.ok(ApiResponse.success(saved, "Producto creado", request.getRequestURI()));
     }
 
     @PutMapping("/{id}")
-    public Producto actualizar(@PathVariable Long id, @RequestBody Producto producto) {
-        producto.setId(id);  // Asegura que actualiza el existente
-        return productoService.save(producto);
+    public ResponseEntity<ApiResponse<Producto>> actualizar(@PathVariable Long id, @RequestBody Producto producto, HttpServletRequest request) {
+        producto.setId(id);
+        Producto updated = productoService.save(producto);
+        return ResponseEntity.ok(ApiResponse.success(updated, "Producto actualizado", request.getRequestURI()));
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void eliminar(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> eliminar(@PathVariable Long id, HttpServletRequest request) {
         productoService.deleteById(id);
+        return ResponseEntity.ok(ApiResponse.success(null, "Producto eliminado", request.getRequestURI()));
     }
-    
+
     @GetMapping("/nombre/{nombre}")
-    public ResponseEntity<List<Producto>> obtenerPorNombre(@PathVariable String nombre) {
-        return productoService.findByNombreOrCodigo(nombre)
-                .isEmpty() ? ResponseEntity.notFound().build()
-                : ResponseEntity.ok(productoService.findByNombreOrCodigo(nombre));                
+    public ResponseEntity<ApiResponse<List<Producto>>> obtenerPorNombre(@PathVariable String nombre, HttpServletRequest request) {
+        List<Producto> productos = productoService.findByNombreOrCodigo(nombre);
+        if (productos.isEmpty()) {
+            return ResponseEntity.ok(ApiResponse.success(productos, "No se encontraron productos", request.getRequestURI()));
+        }
+        return ResponseEntity.ok(ApiResponse.success(productos, "Productos encontrados", request.getRequestURI()));
     }
 
     @GetMapping("/buscar")
-    public ResponseEntity<List<Producto>> buscarPorNombre(@RequestParam String nombre) {
-        // Spring busca automáticamente el parámetro ?nombre=... en la URL
-        return ResponseEntity.ok(productoService.findByNombreOrCodigo(nombre));
+    public ResponseEntity<ApiResponse<List<Producto>>> buscarPorNombre(@RequestParam String nombre, HttpServletRequest request) {
+        List<Producto> productos = productoService.findByNombreOrCodigo(nombre);
+        return ResponseEntity.ok(ApiResponse.success(productos, "Resultado de búsqueda", request.getRequestURI()));
     }
+
     @GetMapping("/paginar")
-    public ResponseEntity<Page<Producto>> listarProductos( @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size) 
-    {
+    public ResponseEntity<ApiResponse<Page<Producto>>> listarProductos(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(productoService.obtenerTodos(pageable));
+        return ResponseEntity.ok(ApiResponse.success(productoService.obtenerTodos(pageable), "Productos paginados", "/api/productos/paginar"));
     }
-    
 }
