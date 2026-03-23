@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.proyecto.demo.dto.AlmacenDto;
 import com.proyecto.demo.exceptions.ApiResponse;
-import com.proyecto.demo.model.entity.Almacen;
 import com.proyecto.demo.service.AlmacenService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,38 +37,38 @@ public class AlmacenController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Almacen>>> listarTodos(HttpServletRequest request) {
-        List<Almacen> lista = almacenService.findAll();
+    public ResponseEntity<ApiResponse<List<AlmacenDto>>> listarTodos(HttpServletRequest request) {
+        List<AlmacenDto> lista = almacenService.findAll();
         return ResponseEntity.ok(ApiResponse.success(lista, "Lista de almacenes", request.getRequestURI()));
     }
 
     @GetMapping("/paginar")
-    public ResponseEntity<ApiResponse<Page<Almacen>>> listarPaginado(
+    public ResponseEntity<ApiResponse<Page<AlmacenDto>>> listarPaginado(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             HttpServletRequest request) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Almacen> pagina = almacenService.findAllPageable(pageable);
+        Page<AlmacenDto> pagina = almacenService.findAllPageable(pageable);
         return ResponseEntity.ok(ApiResponse.success(pagina, "Almacenes paginados", request.getRequestURI()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Almacen>> getById(@PathVariable Long id, HttpServletRequest request) {
-        Almacen almacen = almacenService.findById(id)
+    public ResponseEntity<ApiResponse<AlmacenDto>> getById(@PathVariable Long id, HttpServletRequest request) {
+        AlmacenDto almacen = almacenService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Almacén no encontrado con ID: " + id));
         return ResponseEntity.ok(ApiResponse.success(almacen, "Almacén encontrado", request.getRequestURI()));
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Almacen>> crear(@RequestBody Almacen almacen, HttpServletRequest request) {
-        Almacen saved = almacenService.save(almacen);
+    public ResponseEntity<ApiResponse<AlmacenDto>> crear(@RequestBody AlmacenDto almacen, HttpServletRequest request) {
+        AlmacenDto saved = almacenService.save(almacen);
         return ResponseEntity.ok(ApiResponse.success(saved, "Almacén creado", request.getRequestURI()));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Almacen>> actualizar(@PathVariable Long id, @RequestBody Almacen almacen, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<AlmacenDto>> actualizar(@PathVariable Long id, @RequestBody AlmacenDto almacen, HttpServletRequest request) {
         almacen.setId(id);
-        Almacen updated = almacenService.save(almacen);
+        AlmacenDto updated = almacenService.save(almacen);
         return ResponseEntity.ok(ApiResponse.success(updated, "Almacén actualizado", request.getRequestURI()));
     }
 

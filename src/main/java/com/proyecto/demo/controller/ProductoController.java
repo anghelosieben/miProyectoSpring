@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.proyecto.demo.dto.ProductoDto;
 import com.proyecto.demo.exceptions.ApiResponse;
-import com.proyecto.demo.model.entity.Producto;
 import com.proyecto.demo.service.ProductoService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,29 +34,29 @@ public class ProductoController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Producto>>> listarTodos() {
-        List<Producto> productos = productoService.findAll();
+    public ResponseEntity<ApiResponse<List<ProductoDto>>> listarTodos() {
+        List<ProductoDto> productos = productoService.findAll();
         return ResponseEntity.ok(ApiResponse.success(productos, "Lista de productos", "/api/productos"));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Producto>> getById(@PathVariable Long id, HttpServletRequest request) {
-        Producto product = productoService.findById(id)
+    public ResponseEntity<ApiResponse<ProductoDto>> getById(@PathVariable Long id, HttpServletRequest request) {
+        ProductoDto product = productoService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado con ID: " + id));
         return ResponseEntity.ok(ApiResponse.success(product, "Producto encontrado", request.getRequestURI()));
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<ApiResponse<Producto>> crear(@RequestBody Producto producto, HttpServletRequest request) {
-        Producto saved = productoService.save(producto);
+    public ResponseEntity<ApiResponse<ProductoDto>> crear(@RequestBody ProductoDto producto, HttpServletRequest request) {
+        ProductoDto saved = productoService.save(producto);
         return ResponseEntity.ok(ApiResponse.success(saved, "Producto creado", request.getRequestURI()));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Producto>> actualizar(@PathVariable Long id, @RequestBody Producto producto, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<ProductoDto>> actualizar(@PathVariable Long id, @RequestBody ProductoDto producto, HttpServletRequest request) {
         producto.setId(id);
-        Producto updated = productoService.save(producto);
+        ProductoDto updated = productoService.save(producto);
         return ResponseEntity.ok(ApiResponse.success(updated, "Producto actualizado", request.getRequestURI()));
     }
 
@@ -68,8 +68,8 @@ public class ProductoController {
     }
 
     @GetMapping("/nombre/{nombre}")
-    public ResponseEntity<ApiResponse<List<Producto>>> obtenerPorNombre(@PathVariable String nombre, HttpServletRequest request) {
-        List<Producto> productos = productoService.findByNombreOrCodigo(nombre);
+    public ResponseEntity<ApiResponse<List<ProductoDto>>> obtenerPorNombre(@PathVariable String nombre, HttpServletRequest request) {
+        List<ProductoDto> productos = productoService.findByNombreOrCodigo(nombre);
         if (productos.isEmpty()) {
             return ResponseEntity.ok(ApiResponse.success(productos, "No se encontraron productos", request.getRequestURI()));
         }
@@ -77,13 +77,13 @@ public class ProductoController {
     }
 
     @GetMapping("/buscar")
-    public ResponseEntity<ApiResponse<List<Producto>>> buscarPorNombre(@RequestParam String nombre, HttpServletRequest request) {
-        List<Producto> productos = productoService.findByNombreOrCodigo(nombre);
+    public ResponseEntity<ApiResponse<List<ProductoDto>>> buscarPorNombre(@RequestParam String nombre, HttpServletRequest request) {
+        List<ProductoDto> productos = productoService.findByNombreOrCodigo(nombre);
         return ResponseEntity.ok(ApiResponse.success(productos, "Resultado de búsqueda", request.getRequestURI()));
     }
 
     @GetMapping("/paginar")
-    public ResponseEntity<ApiResponse<Page<Producto>>> listarProductos(
+    public ResponseEntity<ApiResponse<Page<ProductoDto>>> listarProductos(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);

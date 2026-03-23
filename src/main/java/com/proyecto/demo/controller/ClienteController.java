@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.proyecto.demo.dto.ClienteDto;
 import com.proyecto.demo.exceptions.ApiResponse;
-import com.proyecto.demo.model.entity.Cliente;
 import com.proyecto.demo.service.ClienteService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,14 +27,14 @@ public class ClienteController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Cliente>>> obtenerTodos(HttpServletRequest request) {
-        List<Cliente> lista = clienteService.obtenerTodos();
+    public ResponseEntity<ApiResponse<List<ClienteDto>>> obtenerTodos(HttpServletRequest request) {
+        List<ClienteDto> lista = clienteService.obtenerTodos();
         return ResponseEntity.ok(ApiResponse.success(lista, "Lista de clientes", request.getRequestURI()));
     }
 
     @GetMapping("/buscar")
-    public ResponseEntity<ApiResponse<List<Cliente>>> buscarPorCiONit(@RequestParam String termino, HttpServletRequest request) {
-        List<Cliente> clientes = clienteService.obtenerPorCiONit(termino);
+    public ResponseEntity<ApiResponse<List<ClienteDto>>> buscarPorCiONit(@RequestParam String termino, HttpServletRequest request) {
+        List<ClienteDto> clientes = clienteService.obtenerPorCiONit(termino);
         if (clientes.isEmpty()) {
             return ResponseEntity.ok(ApiResponse.success(clientes, "No se encontraron clientes", request.getRequestURI()));
         }
@@ -42,8 +42,8 @@ public class ClienteController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Cliente>> agregarCliente(@RequestBody Cliente cliente, HttpServletRequest request) {
-        Cliente nuevo = clienteService.agregarCliente(cliente);
+    public ResponseEntity<ApiResponse<ClienteDto>> agregarCliente(@RequestBody ClienteDto cliente, HttpServletRequest request) {
+        ClienteDto nuevo = clienteService.agregarCliente(cliente);
         return ResponseEntity.ok(ApiResponse.success(nuevo, "Cliente creado", request.getRequestURI()));
     }
 }

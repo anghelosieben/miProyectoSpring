@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.proyecto.demo.dto.ProveedorDto;
 import com.proyecto.demo.exceptions.ApiResponse;
-import com.proyecto.demo.model.entity.Proveedor;
 import com.proyecto.demo.service.ProveedorService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,38 +37,38 @@ public class ProveedorController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Proveedor>>> listarTodos(HttpServletRequest request) {
-        List<Proveedor> lista = proveedorService.findAll();
+    public ResponseEntity<ApiResponse<List<ProveedorDto>>> listarTodos(HttpServletRequest request) {
+        List<ProveedorDto> lista = proveedorService.findAll();
         return ResponseEntity.ok(ApiResponse.success(lista, "Lista de proveedores", request.getRequestURI()));
     }
 
     @GetMapping("/paginar")
-    public ResponseEntity<ApiResponse<Page<Proveedor>>> listarPaginado(
+    public ResponseEntity<ApiResponse<Page<ProveedorDto>>> listarPaginado(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             HttpServletRequest request) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Proveedor> pagina = proveedorService.findAllPageable(pageable);
+        Page<ProveedorDto> pagina = proveedorService.findAllPageable(pageable);
         return ResponseEntity.ok(ApiResponse.success(pagina, "Proveedores paginados", request.getRequestURI()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Proveedor>> getById(@PathVariable Long id, HttpServletRequest request) {
-        Proveedor proveedor = proveedorService.findById(id)
+    public ResponseEntity<ApiResponse<ProveedorDto>> getById(@PathVariable Long id, HttpServletRequest request) {
+        ProveedorDto proveedor = proveedorService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Proveedor no encontrado con ID: " + id));
         return ResponseEntity.ok(ApiResponse.success(proveedor, "Proveedor encontrado", request.getRequestURI()));
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Proveedor>> crear(@RequestBody Proveedor proveedor, HttpServletRequest request) {
-        Proveedor saved = proveedorService.save(proveedor);
+    public ResponseEntity<ApiResponse<ProveedorDto>> crear(@RequestBody ProveedorDto proveedor, HttpServletRequest request) {
+        ProveedorDto saved = proveedorService.save(proveedor);
         return ResponseEntity.ok(ApiResponse.success(saved, "Proveedor creado", request.getRequestURI()));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Proveedor>> actualizar(@PathVariable Long id, @RequestBody Proveedor proveedor, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<ProveedorDto>> actualizar(@PathVariable Long id, @RequestBody ProveedorDto proveedor, HttpServletRequest request) {
         proveedor.setId(id);
-        Proveedor updated = proveedorService.save(proveedor);
+        ProveedorDto updated = proveedorService.save(proveedor);
         return ResponseEntity.ok(ApiResponse.success(updated, "Proveedor actualizado", request.getRequestURI()));
     }
 

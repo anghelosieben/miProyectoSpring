@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.proyecto.demo.dto.MovimientoInventarioDto;
 import com.proyecto.demo.exceptions.ApiResponse;
-import com.proyecto.demo.model.entity.MovimientoInventario;
 import com.proyecto.demo.service.MovimientoInventarioService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,38 +37,38 @@ public class MovimientoInventarioController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<MovimientoInventario>>> listarTodos(HttpServletRequest request) {
-        List<MovimientoInventario> lista = movimientoService.findAll();
+    public ResponseEntity<ApiResponse<List<MovimientoInventarioDto>>> listarTodos(HttpServletRequest request) {
+        List<MovimientoInventarioDto> lista = movimientoService.findAll();
         return ResponseEntity.ok(ApiResponse.success(lista, "Lista de movimientos", request.getRequestURI()));
     }
 
     @GetMapping("/paginar")
-    public ResponseEntity<ApiResponse<Page<MovimientoInventario>>> listarPaginado(
+    public ResponseEntity<ApiResponse<Page<MovimientoInventarioDto>>> listarPaginado(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             HttpServletRequest request) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<MovimientoInventario> pagina = movimientoService.findAllPageable(pageable);
+        Page<MovimientoInventarioDto> pagina = movimientoService.findAllPageable(pageable);
         return ResponseEntity.ok(ApiResponse.success(pagina, "Movimientos paginados", request.getRequestURI()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<MovimientoInventario>> getById(@PathVariable Long id, HttpServletRequest request) {
-        MovimientoInventario movimiento = movimientoService.findById(id)
+    public ResponseEntity<ApiResponse<MovimientoInventarioDto>> getById(@PathVariable Long id, HttpServletRequest request) {
+        MovimientoInventarioDto movimiento = movimientoService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Movimiento no encontrado con ID: " + id));
         return ResponseEntity.ok(ApiResponse.success(movimiento, "Movimiento encontrado", request.getRequestURI()));
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<MovimientoInventario>> crear(@RequestBody MovimientoInventario movimiento, HttpServletRequest request) {
-        MovimientoInventario saved = movimientoService.save(movimiento);
+    public ResponseEntity<ApiResponse<MovimientoInventarioDto>> crear(@RequestBody MovimientoInventarioDto movimiento, HttpServletRequest request) {
+        MovimientoInventarioDto saved = movimientoService.save(movimiento);
         return ResponseEntity.ok(ApiResponse.success(saved, "Movimiento creado", request.getRequestURI()));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<MovimientoInventario>> actualizar(@PathVariable Long id, @RequestBody MovimientoInventario movimiento, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<MovimientoInventarioDto>> actualizar(@PathVariable Long id, @RequestBody MovimientoInventarioDto movimiento, HttpServletRequest request) {
         movimiento.setId(id);
-        MovimientoInventario updated = movimientoService.save(movimiento);
+        MovimientoInventarioDto updated = movimientoService.save(movimiento);
         return ResponseEntity.ok(ApiResponse.success(updated, "Movimiento actualizado", request.getRequestURI()));
     }
 

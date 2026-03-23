@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.proyecto.demo.dto.CategoriaDto;
 import com.proyecto.demo.exceptions.ApiResponse;
-import com.proyecto.demo.model.entity.Categoria;
 import com.proyecto.demo.service.CategoriaService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,28 +33,28 @@ public class CategoriaController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Categoria>>> listarTodos(HttpServletRequest request) {
-        List<Categoria> lista = categoriaService.findAll();
+    public ResponseEntity<ApiResponse<List<CategoriaDto>>> listarTodos(HttpServletRequest request) {
+        List<CategoriaDto> lista = categoriaService.findAll();
         return ResponseEntity.ok(ApiResponse.success(lista, "Lista de categorías", request.getRequestURI()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Categoria>> getById(@PathVariable Long id, HttpServletRequest request) {
-        Categoria categoria = categoriaService.findById(id)
+    public ResponseEntity<ApiResponse<CategoriaDto>> getById(@PathVariable Long id, HttpServletRequest request) {
+        CategoriaDto categoria = categoriaService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Categoría no encontrada con ID: " + id));
         return ResponseEntity.ok(ApiResponse.success(categoria, "Categoría encontrada", request.getRequestURI()));
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Categoria>> crear(@RequestBody Categoria categoria, HttpServletRequest request) {
-        Categoria saved = categoriaService.save(categoria);
+    public ResponseEntity<ApiResponse<CategoriaDto>> crear(@RequestBody CategoriaDto categoria, HttpServletRequest request) {
+        CategoriaDto saved = categoriaService.save(categoria);
         return ResponseEntity.ok(ApiResponse.success(saved, "Categoría creada", request.getRequestURI()));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Categoria>> actualizar(@PathVariable Long id, @RequestBody Categoria categoria, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<CategoriaDto>> actualizar(@PathVariable Long id, @RequestBody CategoriaDto categoria, HttpServletRequest request) {
         categoria.setId(id);
-        Categoria updated = categoriaService.save(categoria);
+        CategoriaDto updated = categoriaService.save(categoria);
         return ResponseEntity.ok(ApiResponse.success(updated, "Categoría actualizada", request.getRequestURI()));
     }
 

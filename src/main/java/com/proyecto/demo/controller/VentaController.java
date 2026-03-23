@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.proyecto.demo.dto.VentaDto;
 import com.proyecto.demo.exceptions.ApiResponse;
-import com.proyecto.demo.model.entity.Venta;
 import com.proyecto.demo.service.VentaService;
 import com.proyecto.demo.service.ReporteService;
 
@@ -35,26 +35,24 @@ public class VentaController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Venta>>> listarTodos(HttpServletRequest request) {
-        List<Venta> lista = ventaService.findAll();
+    public ResponseEntity<ApiResponse<List<VentaDto>>> listarTodos(HttpServletRequest request) {
+        List<VentaDto> lista = ventaService.findAll();
         System.out.println("Ventas encontradas: " + lista);
         return ResponseEntity.ok(ApiResponse.success(lista, "Lista de ventas", request.getRequestURI()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Venta>> getById(@PathVariable Long id, HttpServletRequest request) {
-        Venta venta = ventaService.findById(id)
+    public ResponseEntity<ApiResponse<VentaDto>> getById(@PathVariable Long id, HttpServletRequest request) {
+        VentaDto venta = ventaService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Venta no encontrada con ID: " + id));
         return ResponseEntity.ok(ApiResponse.success(venta, "Venta encontrada", request.getRequestURI()));
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Venta>> crearVenta(@RequestBody Venta venta, HttpServletRequest request) {
-        Venta nueva = ventaService.realizarVenta(venta);
+    public ResponseEntity<ApiResponse<VentaDto>> crearVenta(@RequestBody VentaDto venta, HttpServletRequest request) {
+        VentaDto nueva = ventaService.realizarVenta(venta);
         return ResponseEntity.ok(ApiResponse.success(nueva, "Venta creada", request.getRequestURI()));
     }
-
-    // ========== Endpoints de REPORTES (SIN ApiResponse - retornan archivos) ==========
 
     @GetMapping("/{ventaId}/reporte/pdf")
     public ResponseEntity<byte[]> descargarReportePDF(@PathVariable Long ventaId) {
