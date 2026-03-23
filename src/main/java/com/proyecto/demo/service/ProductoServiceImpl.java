@@ -6,69 +6,83 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // Usar la anotación de Spring
+import org.springframework.transaction.annotation.Transactional;
+
+import com.proyecto.demo.dto.ProductoDto;
+import com.proyecto.demo.mapper.ProductoMapper;
 import com.proyecto.demo.model.entity.Producto;
 import com.proyecto.demo.repository.ProductoRepository;
 
 @Service
-@Transactional(readOnly = true)  // Todas las lecturas son readOnly por default
+@Transactional(readOnly = true)
 public class ProductoServiceImpl implements ProductoService {
 
-   private final ProductoRepository productoRepository;
+    private final ProductoRepository productoRepository;
+    private final ProductoMapper productoMapper;
 
-    // Inyección por constructor (mejor práctica)
-    public ProductoServiceImpl(ProductoRepository productoRepository) {
+    public ProductoServiceImpl(ProductoRepository productoRepository, ProductoMapper productoMapper) {
         this.productoRepository = productoRepository;
+        this.productoMapper = productoMapper;
     }
 
     @Override
-    public List<Producto> findAll() {
-        return productoRepository.findAll();
+    public List<ProductoDto> findAll() {
+        return productoRepository.findAll().stream()
+                .map(productoMapper::toDto)
+                .toList();
     }
 
     @Override
-    public Optional<Producto> findById(Long id) {
-        return productoRepository.findById(id);
+    public Optional<ProductoDto> findById(Long id) {
+        return productoRepository.findById(id)
+                .map(productoMapper::toDto);
     }
 
     @Override
-    @Transactional  // Esta sí escribe en BD, por eso @Transactional sin readOnly
-    public Producto save(Producto producto) {
-        // Aquí puedes agregar validaciones de negocio
-        if (producto.getPrecioCompra() == null || producto.getPrecioCompra() < 0) {
+    @Transactional
+    public ProductoDto save(ProductoDto productoDto) {
+        if (productoDto.getPrecioCompra() == null || productoDto.getPrecioCompra() < 0) {
             throw new IllegalArgumentException("El precio de compra debe ser positivo");
         }
-        if (producto.getPrecioVenta() == null || producto.getPrecioVenta() < 0) {
+        if (productoDto.getPrecioVenta() == null || productoDto.getPrecioVenta() < 0) {
             throw new IllegalArgumentException("El precio de venta debe ser positivo");
         }
-        if (producto.getNombre() == null || producto.getNombre().trim().isEmpty()) {
+        if (productoDto.getNombre() == null || productoDto.getNombre().trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre del producto es obligatorio");
         }
+        
+        Producto producto = productoMapper.toEntity(productoDto);
         producto.setUsuarioRegistro(1000L);
-        /*producto.setEstado("AC");
-        producto.setFechaRegistro(new Date());
-        producto.setFechaActualizacion(new Date());*/
-        return productoRepository.save(producto);
+        Producto saved = productoRepository.save(producto);
+        return productoMapper.toDto(saved);
     }
 
     @Override
     @Transactional
     public void deleteById(Long id) {
-        if (!productoRepository.existsById(id)) {
-            throw new RuntimeException("Producto con ID " + id + " no encontrado");
+        Optional<Producto> productoOpt = productoRepository.findById(id);
+        if (productoOpt.isPresent()) {
+            Producto producto = productoOpt.get();
+            producto.setEstado("AN");
+            productoRepository.save(producto);
         }
-        productoRepository.deleteById(id);
     }
 
     @Override
-    public List<Producto> findByNombreOrCodigo(String nombre) {
-        System.out.println("nombre en service: "+nombre);
-        var producto=productoRepository.buscarPorNombreOCodigo(nombre);
-        return producto;
+    public List<ProductoDto> findByNombreOrCodigo(String nombre) {
+        return productoRepository.buscarPorNombreOCodigo(nombre).stream()
+                .map(productoMapper::toDto)
+                .toList();
     }
-    
+
     @Override
-    public Page<Producto> obtenerTodos(Pageable pageable) {
-        return productoRepository.findAll(pageable);
+    public Page<ProductoDto> obtenerTodos(Pageable pageable) {
+        return productoRepository.findAll(pageable)
+                .map(productoMapper::toDto);
+    }
+
+    @Override
+    public Optional<Producto> findEntityById(Long id) {
+        return productoRepository.findById(id);
     }
 }

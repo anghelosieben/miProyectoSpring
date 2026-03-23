@@ -1,41 +1,61 @@
 package com.proyecto.demo.service;
 
+import com.proyecto.demo.dto.ClienteDto;
+import com.proyecto.demo.mapper.ClienteMapper;
 import com.proyecto.demo.model.entity.Cliente;
 import com.proyecto.demo.repository.ClienteRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class ClienteServiceImpl implements ClienteService {
 
-    @Autowired
-    private ClienteRepository clienteRepository;
+    private final ClienteRepository clienteRepository;
+    private final ClienteMapper clienteMapper;
+
+    public ClienteServiceImpl(ClienteRepository clienteRepository, ClienteMapper clienteMapper) {
+        this.clienteRepository = clienteRepository;
+        this.clienteMapper = clienteMapper;
+    }
 
     @Override
-    public List<Cliente> obtenerPorCiONit(String ciOrNit) {
-        List<Cliente> cliente = clienteRepository.findByNitContaining(ciOrNit);
-        System.out.println("Cliente encontrado por CI: " + cliente);
-        if (!cliente.isEmpty()) {
-            return cliente;
+    public List<ClienteDto> obtenerPorCiONit(String ciOrNit) {
+        List<Cliente> clientes = clienteRepository.findByNitContaining(ciOrNit);
+        if (!clientes.isEmpty()) {
+            return clientes.stream().map(clienteMapper::toDto).toList();
         }
-        return clienteRepository.findByNit(ciOrNit);
+        return clienteRepository.findByNit(ciOrNit).stream()
+                .map(clienteMapper::toDto)
+                .toList();
     }
 
     @Override
-    public List<Cliente> obtenerTodos() {
-        return clienteRepository.findAll();
+    public List<ClienteDto> obtenerTodos() {
+        return clienteRepository.findAll().stream()
+                .map(clienteMapper::toDto)
+                .toList();
     }
 
     @Override
-    public Cliente agregarCliente(Cliente cliente) {
-        return clienteRepository.save(cliente);
+    public ClienteDto agregarCliente(ClienteDto clienteDto) {
+        Cliente cliente = clienteMapper.toEntity(clienteDto);
+        Cliente saved = clienteRepository.save(cliente);
+        return clienteMapper.toDto(saved);
     }
 
     @Override
-    public List<Cliente> buscarPorCiONit(String termino) {
-        return clienteRepository.findByCiStartingWith(termino);
+    public List<ClienteDto> buscarPorCiONit(String termino) {
+        return clienteRepository.findByCiStartingWith(termino).stream()
+                .map(clienteMapper::toDto)
+                .toList();
+    }
+
+    @Override
+    public Optional<Cliente> findEntityById(Long id) {
+        return clienteRepository.findById(id);
     }
 }

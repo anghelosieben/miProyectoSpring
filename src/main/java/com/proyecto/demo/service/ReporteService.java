@@ -1,6 +1,5 @@
 package com.proyecto.demo.service;
 
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Base64;

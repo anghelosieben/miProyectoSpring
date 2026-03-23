@@ -8,51 +8,63 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.proyecto.demo.dto.UserDto;
+import com.proyecto.demo.mapper.UserMapper;
 import com.proyecto.demo.model.entity.User;
 import com.proyecto.demo.repository.UserRepository;
 
-/**
- * @author Anghelo Muñoz Lopez
- * @since 2026-02-25
- */
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
     @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public List<UserDto> findAll() {
+        return userRepository.findAll().stream()
+                .map(userMapper::toDto)
+                .toList();
     }
 
     @Override
-    public Optional<User> findById(Long id) {
-        return userRepository.findById(id);
+    public Optional<UserDto> findById(Long id) {
+        return userRepository.findById(id)
+                .map(userMapper::toDto);
     }
 
     @Override
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public Optional<UserDto> findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .map(userMapper::toDto);
     }
 
     @Override
-    public User save(User user) {
-        return userRepository.save(user);
+    public UserDto save(UserDto userDto) {
+        User user = userMapper.toEntity(userDto);
+        User saved = userRepository.save(user);
+        return userMapper.toDto(saved);
     }
 
     @Override
     public void deleteById(Long id) {
-        userRepository.deleteById(id);
+        Optional<User> userOpt = userRepository.findById(id);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setEstado("AN");
+            userRepository.save(user);
+        }
     }
 
     @Override
-    public Page<User> findAllPageable(Pageable pageable) {
-        return userRepository.findAll(pageable);
+    public Page<UserDto> findAllPageable(Pageable pageable) {
+        return userRepository.findAll(pageable)
+                .map(userMapper::toDto);
     }
 
     @Override
@@ -63,5 +75,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
+    }
+
+    @Override
+    public Optional<User> findEntityById(Long id) {
+        return userRepository.findById(id);
     }
 }

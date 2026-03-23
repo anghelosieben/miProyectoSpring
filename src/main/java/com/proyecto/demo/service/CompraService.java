@@ -6,16 +6,15 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.proyecto.demo.dto.CompraDto;
 import com.proyecto.demo.model.entity.Compra;
 
-/**
- * @author Anghelo Muñoz Lopez
- */
 public interface CompraService {
-    Compra realizarCompra(Compra compra);
-    List<Compra> findAll();
-    Optional<Compra> findById(Long id);
-    Compra save(Compra compra);
+    CompraDto realizarCompra(CompraDto compraDto);
+    List<CompraDto> findAll();
+    Optional<CompraDto> findById(Long id);
+    CompraDto save(CompraDto compraDto);
     void deleteById(Long id);
-    Page<Compra> findAllPageable(Pageable pageable);
+    Page<CompraDto> findAllPageable(Pageable pageable);
+    Optional<Compra> findEntityById(Long id);
 }

@@ -6,16 +6,14 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.proyecto.demo.dto.MovimientoInventarioDto;
 import com.proyecto.demo.model.entity.MovimientoInventario;
 
-/**
- * @author Anghelo Muñoz Lopez
- * @since 2026-02-25
- */
 public interface MovimientoInventarioService {
-    List<MovimientoInventario> findAll();
-    Optional<MovimientoInventario> findById(Long id);
-    MovimientoInventario save(MovimientoInventario movimiento);
+    List<MovimientoInventarioDto> findAll();
+    Optional<MovimientoInventarioDto> findById(Long id);
+    MovimientoInventarioDto save(MovimientoInventarioDto movimientoDto);
     void deleteById(Long id);
-    Page<MovimientoInventario> findAllPageable(Pageable pageable);
+    Page<MovimientoInventarioDto> findAllPageable(Pageable pageable);
+    Optional<MovimientoInventario> findEntityById(Long id);
 }

@@ -8,55 +8,72 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.proyecto.demo.dto.RoleDto;
+import com.proyecto.demo.mapper.RoleMapper;
 import com.proyecto.demo.model.entity.Role;
 import com.proyecto.demo.repository.RoleRepository;
 
-/**
- * @author Anghelo Muñoz Lopez
- * @since 2026-02-25
- */
 @Service
 @Transactional
 public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;
+    private final RoleMapper roleMapper;
 
-    public RoleServiceImpl(RoleRepository roleRepository) {
+    public RoleServiceImpl(RoleRepository roleRepository, RoleMapper roleMapper) {
         this.roleRepository = roleRepository;
+        this.roleMapper = roleMapper;
     }
 
     @Override
-    public List<Role> findAll() {
-        return roleRepository.findAll();
+    public List<RoleDto> findAll() {
+        return roleRepository.findAll().stream()
+                .map(roleMapper::toDto)
+                .toList();
     }
 
     @Override
-    public Optional<Role> findById(Long id) {
-        return roleRepository.findById(id);
+    public Optional<RoleDto> findById(Long id) {
+        return roleRepository.findById(id)
+                .map(roleMapper::toDto);
     }
 
     @Override
-    public Optional<Role> findByName(String name) {
-        return roleRepository.findByName(name);
+    public Optional<RoleDto> findByName(String name) {
+        return roleRepository.findByName(name)
+                .map(roleMapper::toDto);
     }
 
     @Override
-    public Role save(Role role) {
-        return roleRepository.save(role);
+    public RoleDto save(RoleDto roleDto) {
+        Role role = roleMapper.toEntity(roleDto);
+        Role saved = roleRepository.save(role);
+        return roleMapper.toDto(saved);
     }
 
     @Override
     public void deleteById(Long id) {
-        roleRepository.deleteById(id);
+        Optional<Role> roleOpt = roleRepository.findById(id);
+        if (roleOpt.isPresent()) {
+            Role role = roleOpt.get();
+            role.setEstado("AN");
+            roleRepository.save(role);
+        }
     }
 
     @Override
-    public Page<Role> findAllPageable(Pageable pageable) {
-        return roleRepository.findAll(pageable);
+    public Page<RoleDto> findAllPageable(Pageable pageable) {
+        return roleRepository.findAll(pageable)
+                .map(roleMapper::toDto);
     }
 
     @Override
     public boolean existsByName(String name) {
         return roleRepository.existsByName(name);
+    }
+
+    @Override
+    public Optional<Role> findEntityById(Long id) {
+        return roleRepository.findById(id);
     }
 }

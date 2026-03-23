@@ -6,18 +6,16 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.proyecto.demo.dto.RoleDto;
 import com.proyecto.demo.model.entity.Role;
 
-/**
- * @author Anghelo Muñoz Lopez
- * @since 2026-02-25
- */
 public interface RoleService {
-    List<Role> findAll();
-    Optional<Role> findById(Long id);
-    Optional<Role> findByName(String name);
-    Role save(Role role);
+    List<RoleDto> findAll();
+    Optional<RoleDto> findById(Long id);
+    Optional<RoleDto> findByName(String name);
+    RoleDto save(RoleDto roleDto);
     void deleteById(Long id);
-    Page<Role> findAllPageable(Pageable pageable);
+    Page<RoleDto> findAllPageable(Pageable pageable);
     boolean existsByName(String name);
+    Optional<Role> findEntityById(Long id);
 }

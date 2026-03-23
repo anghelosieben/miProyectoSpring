@@ -6,16 +6,14 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.proyecto.demo.dto.ProveedorDto;
 import com.proyecto.demo.model.entity.Proveedor;
 
-/**
- * @author Anghelo Muñoz Lopez
- * @since 2026-02-25
- */
 public interface ProveedorService {
-    List<Proveedor> findAll();
-    Optional<Proveedor> findById(Long id);
-    Proveedor save(Proveedor proveedor);
+    List<ProveedorDto> findAll();
+    Optional<ProveedorDto> findById(Long id);
+    ProveedorDto save(ProveedorDto proveedorDto);
     void deleteById(Long id);
-    Page<Proveedor> findAllPageable(Pageable pageable);
+    Page<ProveedorDto> findAllPageable(Pageable pageable);
+    Optional<Proveedor> findEntityById(Long id);
 }

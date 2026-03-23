@@ -9,6 +9,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.proyecto.demo.dto.CompraDto;
+import com.proyecto.demo.dto.DetalleCompraDto;
+import com.proyecto.demo.mapper.AlmacenMapper;
+import com.proyecto.demo.mapper.CompraMapper;
+import com.proyecto.demo.mapper.ProductoMapper;
+import com.proyecto.demo.mapper.ProveedorMapper;
 import com.proyecto.demo.model.entity.Almacen;
 import com.proyecto.demo.model.entity.Compra;
 import com.proyecto.demo.model.entity.DetalleCompra;
@@ -21,9 +27,6 @@ import com.proyecto.demo.repository.ProductoRepository;
 import com.proyecto.demo.repository.StockAlmacenRepository;
 import com.proyecto.demo.security.utils.SecurityUtils;
 
-/**
- * @author Anghelo Muñoz Lopez
- */
 @Service
 @Transactional(readOnly = false)
 public class CompraServiceImpl implements CompraService {
@@ -32,31 +35,43 @@ public class CompraServiceImpl implements CompraService {
     private final ProductoRepository productoRepository;
     private final StockAlmacenRepository stockAlmacenRepository;
     private final SecurityUtils securityUtils;
+    private final CompraMapper compraMapper;
+    private final ProveedorMapper proveedorMapper;
+    private final AlmacenMapper almacenMapper;
+    private final ProductoMapper productoMapper;
 
     public CompraServiceImpl(CompraRepository compraRepository, 
                             MovimientoInventarioRepository movimientoInventarioRepository, 
                             ProductoRepository productoRepository,
                             StockAlmacenRepository stockAlmacenRepository,
-                            SecurityUtils securityUtils) {
+                            SecurityUtils securityUtils,
+                            CompraMapper compraMapper,
+                            ProveedorMapper proveedorMapper,
+                            AlmacenMapper almacenMapper,
+                            ProductoMapper productoMapper) {
         this.compraRepository = compraRepository;
         this.movimientoInventarioRepository = movimientoInventarioRepository;
         this.productoRepository = productoRepository;
         this.stockAlmacenRepository = stockAlmacenRepository;
         this.securityUtils = securityUtils;
+        this.compraMapper = compraMapper;
+        this.proveedorMapper = proveedorMapper;
+        this.almacenMapper = almacenMapper;
+        this.productoMapper = productoMapper;
     }
 
     @Override
     @Transactional
-    public Compra realizarCompra(Compra compra) {
-        // Obtener el almacén del usuario autenticado
+    public CompraDto realizarCompra(CompraDto compraDto) {
         Almacen almacen = securityUtils.getCurrentAlmacen();
         
-        if (compra.getDetalleCompras() == null || compra.getDetalleCompras().isEmpty()) {
+        if (compraDto.getDetalleCompras() == null || compraDto.getDetalleCompras().isEmpty()) {
             throw new IllegalArgumentException("La compra debe tener al menos un detalle");
         }
+        
+        Compra compra = compraMapper.toEntity(compraDto);
         double subtotal = 0.0;
 
-        // 2. Procesar cada detalle (validar, calcular, registrar movimiento, actualizar stock)
         for (DetalleCompra detalle : compra.getDetalleCompras()) {
             Producto producto = detalle.getProducto();
             if (producto == null || producto.getId() == null) {
@@ -68,7 +83,6 @@ public class CompraServiceImpl implements CompraService {
                 throw new IllegalArgumentException("La cantidad debe ser mayor a 0");
             }
 
-            // Calcular subtotal del detalle
             double precio = detalle.getPrecio_unitario();
             if (precio <= 0) {
                 precio = producto.getPrecioCompra();
@@ -84,20 +98,16 @@ public class CompraServiceImpl implements CompraService {
         
         var compraGuardada = compraRepository.save(compra);
 
-        // Actualizar stock en StockAlmacen
         for (DetalleCompra detalle : compraGuardada.getDetalleCompras()) {
             Producto producto = productoRepository.findById(detalle.getProducto().getId()).orElse(null);
             
-            // Buscar o crear stock en el almacén
             StockAlmacen stockAlmacen = stockAlmacenRepository
                     .findByProductoAndAlmacen(producto, almacen)
                     .orElse(null);
             
-            // Guardar stock anterior antes de modificar
             int stockAnterior = (stockAlmacen != null) ? stockAlmacen.getCantidadActual() : 0;
             
             if (stockAlmacen == null) {
-                // Crear nuevo registro de stock
                 stockAlmacen = StockAlmacen.builder()
                         .producto(producto)
                         .almacen(almacen)
@@ -105,12 +115,10 @@ public class CompraServiceImpl implements CompraService {
                         .build();
             }
             
-            // Aumentar stock en el almacén
             int stockPosterior = stockAnterior + detalle.getCantidad();
             stockAlmacen.setCantidadActual(stockPosterior);
             stockAlmacenRepository.save(stockAlmacen);
             
-            // Registrar movimiento de inventario
             MovimientoInventario mov = MovimientoInventario.builder()
                     .producto(producto)
                     .almacen(almacen)
@@ -124,32 +132,48 @@ public class CompraServiceImpl implements CompraService {
 
             movimientoInventarioRepository.save(mov);
         }
-        return compraGuardada;
+        return compraMapper.toDto(compraGuardada);
     }
 
     @Override
-    public List<Compra> findAll() {
-        return compraRepository.findAll();
+    public List<CompraDto> findAll() {
+        return compraRepository.findAll().stream()
+                .map(compraMapper::toDto)
+                .toList();
     }
 
     @Override
-    public Optional<Compra> findById(Long id) {
-        return compraRepository.findById(id);
+    public Optional<CompraDto> findById(Long id) {
+        return compraRepository.findById(id)
+                .map(compraMapper::toDto);
     }
 
     @Override
-    public Compra save(Compra compra) {
-        return compraRepository.save(compra);
+    public CompraDto save(CompraDto compraDto) {
+        Compra compra = compraMapper.toEntity(compraDto);
+        Compra saved = compraRepository.save(compra);
+        return compraMapper.toDto(saved);
     }
 
     @Override
     public void deleteById(Long id) {
-        compraRepository.deleteById(id);
+        Optional<Compra> compraOpt = compraRepository.findById(id);
+        if (compraOpt.isPresent()) {
+            Compra compra = compraOpt.get();
+            compra.setEstado("AN");
+            compraRepository.save(compra);
+        }
     }
 
     @Override
-    public Page<Compra> findAllPageable(Pageable pageable) {
-        return compraRepository.findAll(pageable);
+    public Page<CompraDto> findAllPageable(Pageable pageable) {
+        return compraRepository.findAll(pageable)
+                .map(compraMapper::toDto);
+    }
+
+    @Override
+    public Optional<Compra> findEntityById(Long id) {
+        return compraRepository.findById(id);
     }
 
 }

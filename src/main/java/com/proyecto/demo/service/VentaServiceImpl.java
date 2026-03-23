@@ -1,13 +1,14 @@
 package com.proyecto.demo.service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.proyecto.demo.dto.VentaDto;
+import com.proyecto.demo.mapper.VentaMapper;
 import com.proyecto.demo.model.entity.Almacen;
 import com.proyecto.demo.model.entity.DetalleVenta;
 import com.proyecto.demo.model.entity.MovimientoInventario;
@@ -21,10 +22,6 @@ import com.proyecto.demo.repository.StockAlmacenRepository;
 import com.proyecto.demo.repository.VentasRepository;
 import com.proyecto.demo.security.utils.SecurityUtils;
 
-/**
- * @author Anghelo Muñoz Lopez
- * @since 2026-02-25
- */
 @Service
 @Transactional(readOnly = true)
 public class VentaServiceImpl implements VentaService {
@@ -33,42 +30,43 @@ public class VentaServiceImpl implements VentaService {
     private final MovimientoInventarioRepository movimientoInventarioRepository;
     private final StockAlmacenRepository stockAlmacenRepository;
     private final SecurityUtils securityUtils;
+    private final VentaMapper ventaMapper;
 
     public VentaServiceImpl(VentasRepository ventasRepository, ProductoRepository productoRepository, 
                            MovimientoInventarioRepository movimientoInventarioRepository,
                            StockAlmacenRepository stockAlmacenRepository,
-                           SecurityUtils securityUtils) {
+                           SecurityUtils securityUtils,
+                           VentaMapper ventaMapper) {
         this.ventasRepository = ventasRepository;
         this.productoRepository = productoRepository;
         this.movimientoInventarioRepository = movimientoInventarioRepository;
         this.stockAlmacenRepository = stockAlmacenRepository;
         this.securityUtils = securityUtils;
+        this.ventaMapper = ventaMapper;
     }
 
     @Override
-    public List<Venta> findAll() {
-        // TODO Auto-generated method stub
-        var pVentas = ventasRepository.findAll();
-        return pVentas;
+    public List<VentaDto> findAll() {
+        return ventasRepository.findAll().stream()
+                .map(ventaMapper::toDto)
+                .toList();
     }
 
     @Override
-    public Optional<Venta> findById(Long id) {
-        // TODO Auto-generated method stub
-        return ventasRepository.findById(id);
+    public Optional<VentaDto> findById(Long id) {
+        return ventasRepository.findById(id)
+                .map(ventaMapper::toDto);
     }
 
     @Override
     @Transactional
-    public Venta realizarVenta(Venta venta) {
-        // Obtener usuario y almacén del contexto de seguridad
+    public VentaDto realizarVenta(VentaDto ventaDto) {
         User usuario = securityUtils.getCurrentUser();
         Almacen almacen = securityUtils.getCurrentAlmacen();
         
-        // Asignar usuario y almacén a la venta
+        Venta venta = ventaMapper.toEntity(ventaDto);
         venta.setAlmacen(almacen);
         
-        // 1. Validaciones básicas
         if (venta.getCliente() == null) {
             throw new IllegalArgumentException("La venta debe tener un cliente");
         }
@@ -79,7 +77,6 @@ public class VentaServiceImpl implements VentaService {
         double subtotal = 0.0;
         double descuentoTotal = 0.0;
 
-        // 2. Procesar cada detalle - validar stock
         for (DetalleVenta detalle : venta.getDetalleVentas()) {
             Producto producto = detalle.getProducto();
             Integer cantidad = detalle.getCantidad();
@@ -87,7 +84,6 @@ public class VentaServiceImpl implements VentaService {
                 throw new IllegalArgumentException("Cantidad inválida en detalle");
             }
 
-            // Verificar stock suficiente en StockAlmacen
             Optional<StockAlmacen> stockOpt = stockAlmacenRepository.findByProductoAndAlmacen(producto, almacen);
             int stockActual = stockOpt.map(s -> s.getCantidadActual()).orElse(0);
             
@@ -95,7 +91,6 @@ public class VentaServiceImpl implements VentaService {
                 throw new IllegalStateException("Stock insuficiente en almacén para: " + producto.getNombre() + ". Stock actual: " + stockActual);
             }
 
-            // Calcular valores del detalle
             double precio = producto.getPrecioVenta();
             detalle.setPrecioUnitario(precio);
             double subDetalle = cantidad * precio;
@@ -106,37 +101,30 @@ public class VentaServiceImpl implements VentaService {
             double descuentoItem = detalle.getDescuentoItem() != null ? detalle.getDescuentoItem() : 0;
             descuentoTotal += descuentoItem;
 
-            // Sincronizar relación bidireccional
             detalle.setVenta(venta);
         }
 
-        // 3. Calcular totales finales
         venta.setSubtotal(subtotal);
         venta.setDescuento(descuentoTotal);
         venta.setImpuesto(subtotal * 0.13);
         venta.setTotal(subtotal + venta.getImpuesto() - descuentoTotal);
 
-        // 4. Guardar la venta + detalles (cascade)
         Venta ventaGuardada = ventasRepository.save(venta);
 
-        // 5. Registrar movimientos y actualizar stock en StockAlmacen
         for (DetalleVenta detalle : ventaGuardada.getDetalleVentas()) {
             Producto producto = productoRepository.findById(detalle.getProducto().getId())
                     .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado: " + detalle.getProducto().getId()));
 
-            // Actualizar stock en StockAlmacen
             StockAlmacen stockAlmacen = stockAlmacenRepository
                     .findByProductoAndAlmacen(producto, almacen)
                     .orElseThrow(() -> new IllegalArgumentException("No hay stock para el producto en este almacén"));
             
-            // Guardar stock anterior antes de modificar
             int stockAnterior = stockAlmacen.getCantidadActual();
             int stockPosterior = stockAnterior - detalle.getCantidad();
             
             stockAlmacen.setCantidadActual(stockPosterior);
             stockAlmacenRepository.save(stockAlmacen);
             
-            // Registrar movimiento de inventario
             MovimientoInventario mov = MovimientoInventario.builder()
                     .producto(producto)
                     .almacen(almacen)
@@ -151,7 +139,12 @@ public class VentaServiceImpl implements VentaService {
             movimientoInventarioRepository.save(mov);
         }
 
-        return ventaGuardada;
+        return ventaMapper.toDto(ventaGuardada);
+    }
+
+    @Override
+    public Optional<Venta> findEntityById(Long id) {
+        return ventasRepository.findById(id);
     }
 
 }

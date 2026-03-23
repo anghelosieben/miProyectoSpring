@@ -8,45 +8,62 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.proyecto.demo.dto.MovimientoInventarioDto;
+import com.proyecto.demo.mapper.MovimientoInventarioMapper;
 import com.proyecto.demo.model.entity.MovimientoInventario;
 import com.proyecto.demo.repository.MovimientoInventarioRepository;
 
-/**
- * @author Anghelo Muñoz Lopez
- * @since 2026-02-25
- */
 @Service
 @Transactional
 public class MovimientoInventarioServiceImpl implements MovimientoInventarioService {
 
     private final MovimientoInventarioRepository movimientoRepository;
+    private final MovimientoInventarioMapper movimientoMapper;
 
-    public MovimientoInventarioServiceImpl(MovimientoInventarioRepository movimientoRepository) {
+    public MovimientoInventarioServiceImpl(MovimientoInventarioRepository movimientoRepository, 
+                                           MovimientoInventarioMapper movimientoMapper) {
         this.movimientoRepository = movimientoRepository;
+        this.movimientoMapper = movimientoMapper;
     }
 
     @Override
-    public List<MovimientoInventario> findAll() {
-        return movimientoRepository.findAll();
+    public List<MovimientoInventarioDto> findAll() {
+        return movimientoRepository.findAll().stream()
+                .map(movimientoMapper::toDto)
+                .toList();
     }
 
     @Override
-    public Optional<MovimientoInventario> findById(Long id) {
-        return movimientoRepository.findById(id);
+    public Optional<MovimientoInventarioDto> findById(Long id) {
+        return movimientoRepository.findById(id)
+                .map(movimientoMapper::toDto);
     }
 
     @Override
-    public MovimientoInventario save(MovimientoInventario movimiento) {
-        return movimientoRepository.save(movimiento);
+    public MovimientoInventarioDto save(MovimientoInventarioDto movimientoDto) {
+        MovimientoInventario movimiento = movimientoMapper.toEntity(movimientoDto);
+        MovimientoInventario saved = movimientoRepository.save(movimiento);
+        return movimientoMapper.toDto(saved);
     }
 
     @Override
     public void deleteById(Long id) {
-        movimientoRepository.deleteById(id);
+        Optional<MovimientoInventario> movimientoOpt = movimientoRepository.findById(id);
+        if (movimientoOpt.isPresent()) {
+            MovimientoInventario movimiento = movimientoOpt.get();
+            movimiento.setEstado("AN");
+            movimientoRepository.save(movimiento);
+        }
     }
 
     @Override
-    public Page<MovimientoInventario> findAllPageable(Pageable pageable) {
-        return movimientoRepository.findAll(pageable);
+    public Page<MovimientoInventarioDto> findAllPageable(Pageable pageable) {
+        return movimientoRepository.findAll(pageable)
+                .map(movimientoMapper::toDto);
+    }
+
+    @Override
+    public Optional<MovimientoInventario> findEntityById(Long id) {
+        return movimientoRepository.findById(id);
     }
 }

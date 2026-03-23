@@ -8,45 +8,61 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.proyecto.demo.dto.AlmacenDto;
+import com.proyecto.demo.mapper.AlmacenMapper;
 import com.proyecto.demo.model.entity.Almacen;
 import com.proyecto.demo.repository.AlmacenRepository;
 
-/**
- * @author Anghelo Muñoz Lopez
- * @since 2026-02-25
- */
 @Service
 @Transactional
 public class AlmacenServiceImpl implements AlmacenService {
 
     private final AlmacenRepository almacenRepository;
+    private final AlmacenMapper almacenMapper;
 
-    public AlmacenServiceImpl(AlmacenRepository almacenRepository) {
+    public AlmacenServiceImpl(AlmacenRepository almacenRepository, AlmacenMapper almacenMapper) {
         this.almacenRepository = almacenRepository;
+        this.almacenMapper = almacenMapper;
     }
 
     @Override
-    public List<Almacen> findAll() {
-        return almacenRepository.findAll();
+    public List<AlmacenDto> findAll() {
+        return almacenRepository.findAll().stream()
+                .map(almacenMapper::toDto)
+                .toList();
     }
 
     @Override
-    public Optional<Almacen> findById(Long id) {
-        return almacenRepository.findById(id);
+    public Optional<AlmacenDto> findById(Long id) {
+        return almacenRepository.findById(id)
+                .map(almacenMapper::toDto);
     }
 
     @Override
-    public Almacen save(Almacen almacen) {
-        return almacenRepository.save(almacen);
+    public AlmacenDto save(AlmacenDto almacenDto) {
+        Almacen almacen = almacenMapper.toEntity(almacenDto);
+        Almacen saved = almacenRepository.save(almacen);
+        return almacenMapper.toDto(saved);
     }
 
     @Override
     public void deleteById(Long id) {
-        almacenRepository.deleteById(id);
+        Optional<Almacen> almacenOpt = almacenRepository.findById(id);
+        if (almacenOpt.isPresent()) {
+            Almacen almacen = almacenOpt.get();
+            almacen.setEstado("AN");
+            almacenRepository.save(almacen);
+        }
     }
 
     @Override
-    public Page<Almacen> findAllPageable(Pageable pageable) {
-        return almacenRepository.findAll(pageable);
+    public Page<AlmacenDto> findAllPageable(Pageable pageable) {
+        return almacenRepository.findAll(pageable)
+                .map(almacenMapper::toDto);
+    }
+
+    @Override
+    public Optional<Almacen> findEntityById(Long id) {
+        return almacenRepository.findById(id);
     }
 }

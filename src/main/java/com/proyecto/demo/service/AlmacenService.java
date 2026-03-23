@@ -6,16 +6,14 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.proyecto.demo.dto.AlmacenDto;
 import com.proyecto.demo.model.entity.Almacen;
 
-/**
- * @author Anghelo Muñoz Lopez
- * @since 2026-02-25
- */
 public interface AlmacenService {
-    List<Almacen> findAll();
-    Optional<Almacen> findById(Long id);
-    Almacen save(Almacen almacen);
+    List<AlmacenDto> findAll();
+    Optional<AlmacenDto> findById(Long id);
+    AlmacenDto save(AlmacenDto almacenDto);
     void deleteById(Long id);
-    Page<Almacen> findAllPageable(Pageable pageable);
+    Page<AlmacenDto> findAllPageable(Pageable pageable);
+    Optional<Almacen> findEntityById(Long id);
 }

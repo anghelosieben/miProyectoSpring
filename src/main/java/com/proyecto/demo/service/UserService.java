@@ -6,19 +6,17 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.proyecto.demo.dto.UserDto;
 import com.proyecto.demo.model.entity.User;
 
-/**
- * @author Anghelo Muñoz Lopez
- * @since 2026-02-25
- */
 public interface UserService {
-    List<User> findAll();
-    Optional<User> findById(Long id);
-    Optional<User> findByUsername(String username);
-    User save(User user);
+    List<UserDto> findAll();
+    Optional<UserDto> findById(Long id);
+    Optional<UserDto> findByUsername(String username);
+    UserDto save(UserDto userDto);
     void deleteById(Long id);
-    Page<User> findAllPageable(Pageable pageable);
+    Page<UserDto> findAllPageable(Pageable pageable);
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
+    Optional<User> findEntityById(Long id);
 }
