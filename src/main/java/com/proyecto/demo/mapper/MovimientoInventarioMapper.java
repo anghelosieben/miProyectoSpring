@@ -11,8 +11,8 @@ public interface MovimientoInventarioMapper {
     
     @Mapping(target = "productoId", source = "movimiento.producto.id")
     @Mapping(target = "productoNombre", source = "movimiento.producto.nombre")
-    @Mapping(target = "almacenId", source = "movimiento.almacen.id")
-    @Mapping(target = "almacenNombre", source = "movimiento.almacen.nombre")
+    //@Mapping(target = "almacenId", source = "movimiento.almacen.id")
+    //@Mapping(target = "almacenNombre", source = "movimiento.almacen.nombre")
     MovimientoInventarioDto toDto(MovimientoInventario movimiento);
     
     MovimientoInventario toEntity(MovimientoInventarioDto movimientoDto);

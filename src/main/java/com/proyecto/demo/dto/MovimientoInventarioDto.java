@@ -23,6 +23,7 @@ public class MovimientoInventarioDto {
     private String observacion;
     private BigDecimal stockAnterior;
     private BigDecimal stockPosterior;
-    private Long almacenId;
-    private String almacenNombre;
+    //private Long almacenId;
+    //private String almacenNombre;
+    private AlmacenDto almacen; // Incluye el DTO del almacén para obtener su nombre y otros detalles si es necesario.
 }

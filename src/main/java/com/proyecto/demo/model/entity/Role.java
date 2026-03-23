@@ -14,6 +14,7 @@ import jakarta.persistence.ManyToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
@@ -22,10 +23,11 @@ import lombok.NoArgsConstructor;
  */
 @Entity
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Role {
+public class Role extends Entidad{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
